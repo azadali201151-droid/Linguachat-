@@ -1,5 +1,5 @@
 import { initializeApp, getApps } from "firebase/app";
-import { getAuth, signOut, signInAnonymously, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult } from "firebase/auth";
+import { getAuth, signOut, signInAnonymously, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
@@ -34,31 +34,6 @@ export const signInAnonymouslyUser = async () => {
     return userCredential.user;
   } catch (error: any) {
     console.error("Error signing in anonymously", error);
-    throw error;
-  }
-};
-
-export const signUpWithEmail = async (email: string, password: string, name: string) => {
-  try {
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    await updateProfile(userCredential.user, { displayName: name });
-    return userCredential.user;
-  } catch (error: any) {
-    console.error("Error signing up with email", error);
-    throw error;
-  }
-};
-
-export const signInWithEmail = async (email: string, password?: string) => {
-  try {
-    if (password) {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      return userCredential.user;
-    } else {
-      throw new Error("Password is required for login");
-    }
-  } catch (error: any) {
-    console.error("Error signing in with email", error);
     throw error;
   }
 };
