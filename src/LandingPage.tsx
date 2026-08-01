@@ -34,9 +34,21 @@ export default function LandingPage({ onSignIn, user, onGoToApp, initialError }:
     } catch (error: any) {
       console.error(error);
       if (error?.code === 'auth/cancelled-popup-request' || error?.code === 'auth/popup-closed-by-user') {
-        setErrorMsg('Sign-in popup was closed before completing. Please try again.');
+        setErrorMsg('Sign-in popup was closed before completing. If you are in the preview, try the "Open in new tab" icon. If this persists, the domain might not be authorized.');
+      } else if (error?.code === 'auth/unauthorized-domain') {
+        setErrorMsg(
+          `Domain not authorized for Google Sign-In.\n\n` +
+          `1. Go to Google Cloud Console -> APIs & Services -> Credentials\n` +
+          `2. Click your OAuth 2.0 Client ID (Web client)\n` +
+          `3. Under "Authorized JavaScript origins", add this exact URL.\n` +
+          `4. Under "Authorized redirect URIs", add this URL with /__/auth/handler appended.\n\n` +
+          `(Note: Adding to Firebase alone is not enough for Google Sign-In)`
+        );
       } else {
-        setErrorMsg(`Failed to sign in: ${error?.message || error?.code || 'Unknown Error'}`);
+        setErrorMsg(
+          `Failed to sign in (${error?.code || 'Unknown Error'}).\n\n` +
+          `If this is a custom domain, remember to add it to Google Cloud Console -> APIs & Services -> Credentials -> OAuth 2.0 Client IDs, not just Firebase.`
+        );
       }
     }
   };
@@ -89,7 +101,7 @@ export default function LandingPage({ onSignIn, user, onGoToApp, initialError }:
                   Dashboard
                 </>
               ) : (
-                "Sign In / Sign Up"
+                "Free Sign Up"
               )}
             </button>
           </div>
@@ -162,48 +174,6 @@ export default function LandingPage({ onSignIn, user, onGoToApp, initialError }:
         </div>
       </section>
 
-      {/* Pricing Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Simple, Affordable Pricing</h2>
-          <p className="text-zinc-400 max-w-2xl mx-auto">Science tutoring, exam preparation tools, and expert guidance for less than the price of a cup of tea. Pay smoothly via Easypaisa, JazzCash, or any Pakistani Debit/Credit card.</p>
-        </div>
-
-        <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-          <div className="bg-[#18181b] p-8 rounded-3xl border border-zinc-800 flex flex-col">
-            <h3 className="text-2xl font-bold text-white mb-2">Weekly Plan</h3>
-            <div className="flex items-baseline gap-2 mb-4">
-              <span className="text-4xl font-bold text-indigo-400">Rs. 130</span>
-              <span className="text-zinc-500">/ week</span>
-            </div>
-            <p className="text-zinc-400 mb-8 flex-grow">Perfect for urgent exam or interview prep.</p>
-            <button
-              onClick={handleAction}
-              className="w-full py-3 px-4 bg-zinc-800 hover:bg-zinc-700 text-white rounded-xl font-medium transition-colors"
-            >
-              Choose Weekly
-            </button>
-          </div>
-
-          <div className="bg-gradient-to-b from-indigo-900/20 to-[#18181b] p-8 rounded-3xl border border-indigo-500/30 flex flex-col relative overflow-hidden">
-            <div className="absolute top-0 right-0 bg-indigo-500 text-white text-xs font-bold px-3 py-1 rounded-bl-lg">
-              BEST VALUE
-            </div>
-            <h3 className="text-2xl font-bold text-white mb-2">Monthly Plan</h3>
-            <div className="flex items-baseline gap-2 mb-4">
-              <span className="text-4xl font-bold text-indigo-400">Rs. 500</span>
-              <span className="text-zinc-500">/ month</span>
-            </div>
-            <p className="text-zinc-400 mb-8 flex-grow">Best value for continuous, year-round learning.</p>
-            <button
-              onClick={handleAction}
-              className="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-medium transition-colors shadow-lg shadow-indigo-500/25"
-            >
-              Choose Monthly
-            </button>
-          </div>
-        </div>
-      </section>
 
       {/* FAQ Section */}
       <section className="py-20 bg-[#0a0a0a] px-4 sm:px-6 lg:px-8 border-t border-zinc-800">
@@ -442,7 +412,7 @@ const faqs = [
   },
   {
     question: "How much does LinguaConnect cost, and how do I pay?",
-    answer: "We offer two incredibly affordable plans: Weekly: Rs. 130, Monthly: Rs. 500. You can securely activate your premium features using Easypaisa, JazzCash, or any local bank card."
+    answer: "LinguaConnect is completely free to use! You can sign up for free and get access to all our learning tools instantly."
   },
   {
     question: "Is the app suitable for complete beginners or younger students?",
