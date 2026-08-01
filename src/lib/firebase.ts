@@ -1,5 +1,5 @@
 import { initializeApp, getApps } from "firebase/app";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { getAuth, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
@@ -15,18 +15,6 @@ const firebaseConfig = {
 export const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
-export const googleProvider = new GoogleAuthProvider();
-
-export const signInWithGoogle = async () => {
-  try {
-    await signInWithPopup(auth, googleProvider);
-  } catch (error: any) {
-    if (error?.code !== 'auth/cancelled-popup-request' && error?.code !== 'auth/popup-closed-by-user') {
-      console.error("Error signing in with Google", error);
-    }
-    throw error;
-  }
-};
 
 export const signUpWithEmail = async (email: string, password: string, name: string) => {
   try {
