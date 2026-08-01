@@ -3,8 +3,10 @@
   "appId": "1:442765262051:web:49f39bc7a4e02eb15259d6",
   "apiKey": "AIzaSyBK_S9EBvB_LhR9koiatRknNbL5A6Arp6k",
   "authDomain": "leafy-creek-z8gvj.firebaseapp.com",
-  "firestoreDatabaseId": "ai-studio-3b8cf2d3-5ce1-45ad-9e86-9ec62ae351c8",
+  "firestoreDatabaseId": "ai-studio-linguachat-3b8cf2d3-5ce1-45ad-9e86-9ec62ae351c8",
   "storageBucket": "leafy-creek-z8gvj.firebasestorage.app",
   "messagingSenderId": "442765262051",
-  "measurementId": ""
+  "measurementId": "",
+  "oAuthClientId": "442765262051-egf8lvsobd04f8iat4pao9pffqkegiv4.apps.googleusercontent.com",
+  "recaptchaSiteKey": ""
 }
