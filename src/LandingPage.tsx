@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Globe, BookOpen, User, ArrowRight, MessageSquare, Briefcase, GraduationCap, AlertCircle, LayoutDashboard, X, Mail, Lock } from 'lucide-react';
-import { signInWithEmail, signUpWithEmail } from './lib/firebase';
+import { signInAnonymouslyUser } from './lib/firebase';
 
 interface LandingPageProps {
   onSignIn?: () => void;
@@ -13,11 +13,6 @@ interface LandingPageProps {
 export default function LandingPage({ onSignIn, user, onGoToApp, initialError }: LandingPageProps) {
   const [errorMsg, setErrorMsg] = useState<string | null>(initialError || null);
   const [showAuthModal, setShowAuthModal] = useState(false);
-  const [isSignUp, setIsSignUp] = useState(false);
-  
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   React.useEffect(() => {
@@ -26,16 +21,11 @@ export default function LandingPage({ onSignIn, user, onGoToApp, initialError }:
     }
   }, [initialError]);
 
-  const handleEmailAuth = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleOneClickSignIn = async () => {
     setIsLoading(true);
     setErrorMsg(null);
     try {
-      if (isSignUp) {
-        await signUpWithEmail(email, password, name);
-      } else {
-        await signInWithEmail(email, password);
-      }
+      await signInAnonymouslyUser();
       setShowAuthModal(false);
       if (onSignIn) onSignIn();
     } catch (error: any) {
@@ -217,91 +207,28 @@ export default function LandingPage({ onSignIn, user, onGoToApp, initialError }:
                   <span className="text-xl font-bold text-white tracking-tight">LinguaConnect</span>
                 </div>
                 <h3 className="text-2xl font-bold text-white mb-2">
-                  {isSignUp ? 'Create an Account' : 'Welcome Back'}
+                  Welcome
                 </h3>
                 <p className="text-zinc-400 text-sm">
-                  {isSignUp ? 'Sign up to start learning' : 'Sign in to continue your progress'}
+                  Sign in with one click to start learning instantly
                 </p>
               </div>
 
-              <form onSubmit={handleEmailAuth} className="space-y-4">
-                {isSignUp && (
-                  <div>
-                    <label className="block text-sm font-medium text-zinc-400 mb-1">Full Name</label>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-zinc-500">
-                        <User className="w-5 h-5" />
-                      </div>
-                      <input
-                        type="text"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        className="w-full bg-zinc-900 border border-zinc-800 rounded-xl py-3 pl-10 pr-4 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all"
-                        placeholder="John Doe"
-                        required
-                      />
-                    </div>
-                  </div>
+              <button
+                type="button"
+                onClick={handleOneClickSignIn}
+                disabled={isLoading}
+                className="w-full py-4 px-4 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold text-lg transition-colors shadow-lg shadow-indigo-500/25 flex items-center justify-center disabled:opacity-70"
+              >
+                {isLoading ? (
+                  <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <>
+                    <User className="w-5 h-5 mr-2" />
+                    Start Learning Now
+                  </>
                 )}
-                <div>
-                  <label className="block text-sm font-medium text-zinc-400 mb-1">Email Address</label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-zinc-500">
-                      <Mail className="w-5 h-5" />
-                    </div>
-                    <input
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="w-full bg-zinc-900 border border-zinc-800 rounded-xl py-3 pl-10 pr-4 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all"
-                      placeholder="you@example.com"
-                      required
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-zinc-400 mb-1">Password</label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-zinc-500">
-                      <Lock className="w-5 h-5" />
-                    </div>
-                    <input
-                      type="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="w-full bg-zinc-900 border border-zinc-800 rounded-xl py-3 pl-10 pr-4 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all"
-                      placeholder="••••••••"
-                      required
-                      minLength={6}
-                    />
-                  </div>
-                </div>
-                
-                <button
-                  type="submit"
-                  disabled={isLoading}
-                  className="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-medium transition-colors shadow-lg shadow-indigo-500/25 flex items-center justify-center disabled:opacity-70"
-                >
-                  {isLoading ? (
-                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  ) : (
-                    isSignUp ? 'Sign Up' : 'Sign In'
-                  )}
-                </button>
-              </form>
-
-              <div className="mt-6 text-center text-sm text-zinc-400">
-                {isSignUp ? 'Already have an account?' : "Don't have an account?"}{' '}
-                <button
-                  onClick={() => {
-                    setIsSignUp(!isSignUp);
-                    setErrorMsg(null);
-                  }}
-                  className="text-indigo-400 hover:text-indigo-300 font-medium transition-colors"
-                >
-                  {isSignUp ? 'Sign In' : 'Sign Up'}
-                </button>
-              </div>
+              </button>
             </motion.div>
           </div>
         )}
