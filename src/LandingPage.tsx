@@ -239,7 +239,7 @@ export default function LandingPage({ onSignIn, user, onGoToApp, initialError }:
                 type="button"
                 onClick={handleGoogleSignIn}
                 disabled={isLoading}
-                className="w-full py-4 px-4 bg-white hover:bg-zinc-100 text-zinc-900 rounded-xl font-bold text-lg transition-colors flex items-center justify-center gap-3 shadow-lg shadow-white/5 disabled:opacity-70"
+                className="w-full py-4 px-4 bg-white hover:bg-zinc-100 text-zinc-900 rounded-xl font-bold text-lg transition-colors flex items-center justify-center gap-3 shadow-lg shadow-white/5 disabled:opacity-70 mb-4"
               >
                 {isLoading ? (
                   <div className="w-6 h-6 border-2 border-zinc-300 border-t-zinc-900 rounded-full animate-spin" />
@@ -254,6 +254,15 @@ export default function LandingPage({ onSignIn, user, onGoToApp, initialError }:
                     Continue with Google
                   </>
                 )}
+              </button>
+              
+              <button
+                type="button"
+                onClick={handleOneClickSignIn}
+                disabled={isLoading}
+                className="w-full py-4 px-4 bg-[#0a0a0a] hover:bg-zinc-900 border border-zinc-800 text-zinc-300 rounded-xl font-bold text-lg transition-colors flex items-center justify-center gap-3 disabled:opacity-70"
+              >
+                Continue as Guest
               </button>
             </motion.div>
           </div>
