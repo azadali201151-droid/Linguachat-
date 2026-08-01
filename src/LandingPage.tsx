@@ -22,15 +22,27 @@ export default function LandingPage({ onSignIn, user, onGoToApp, initialError }:
 
   const handleGoogleSignIn = async () => {
     try {
+      if (window.self !== window.top) {
+        setErrorMsg('STOP 🛑: Google Sign-In will NOT work inside this preview window because browsers block popups in iframes.\n\nPlease click the "Open in new tab" icon (↗️) at the top right of this page, and sign in there.');
+        return;
+      }
+      
       setErrorMsg(null);
       await signInWithGoogle();
       if (onSignIn) onSignIn();
     } catch (error: any) {
       console.error(error);
-      if (error?.code === 'auth/cancelled-popup-request' || error?.code === 'auth/popup-closed-by-user') {
-        setErrorMsg('Sign-in popup closed. If it bounced back instantly, you MUST add this preview URL to Firebase Console -> Authentication -> Settings -> Authorized domains.');
-      } else if (error?.code === 'auth/unauthorized-domain') {
-        setErrorMsg('Domain not authorized. Please add this URL to Firebase Console -> Authentication -> Settings -> Authorized domains.');
+      const currentHost = window.location.hostname;
+      if (error?.code === 'auth/cancelled-popup-request' || error?.code === 'auth/popup-closed-by-user' || error?.code === 'auth/unauthorized-domain') {
+        setErrorMsg(
+          `Action Required for Google Sign-In:\n\n` +
+          `1. You must be in a NEW TAB (not the preview).\n` +
+          `2. You added the domain to Firebase, but did you add it to Google Cloud?\n\n` +
+          `Go to Google Cloud Console -> APIs & Services -> Credentials.\n` +
+          `Find your OAuth 2.0 Web Client.\n` +
+          `Add this exact URL to "Authorized JavaScript origins":\nhttps://${currentHost}\n\n` +
+          `Add this exact URL to "Authorized redirect URIs":\nhttps://${currentHost}/__/auth/handler`
+        );
       } else {
         setErrorMsg(`Failed to sign in (${error?.message || error?.code || 'Unknown Error'}). Please ensure Google Sign-In is enabled in Firebase Console.`);
       }
