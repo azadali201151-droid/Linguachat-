@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import LandingPage from './LandingPage';
 import AppHub from './AppHub';
-import { auth } from './lib/firebase';
-import { onAuthStateChanged, User } from 'firebase/auth';
+import { auth, onAuthStateChanged, User } from './lib/auth';
 
 export default function App() {
   const [user, setUser] = useState<User | null>(null);

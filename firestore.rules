@@ -20,8 +20,8 @@ service cloud.firestore {
              data.subscriptionStatus is string && data.subscriptionStatus.size() <= 20 &&
              data.trialUsedSeconds is number &&
              (data.get('planEndTimestamp', null) == null || data.get('planEndTimestamp', null) is number) &&
-             (data.get('planType', null) == null || data.get('planType', null) is string) &&
-             (data.get('region', null) == null || data.get('region', null) is string) &&
+             (data.get('planId', null) == null || data.get('planId', null) is string) &&
+             (data.get('planRegion', null) == null || data.get('planRegion', null) is string) &&
              data.uid == request.auth.uid;
     }
 
@@ -30,7 +30,7 @@ service cloud.firestore {
       allow create: if isSignedIn() && isValidId(userId) && request.auth.uid == userId && isValidUser(incoming());
       allow update: if isSignedIn() && isValidId(userId) && request.auth.uid == userId && isValidUser(incoming()) && (
         (incoming().diff(existing()).affectedKeys().hasOnly(['trialUsedSeconds'])) ||
-        (incoming().diff(existing()).affectedKeys().hasOnly(['subscriptionStatus', 'planEndTimestamp', 'planType', 'region', 'trialUsedSeconds']))
+        (incoming().diff(existing()).affectedKeys().hasOnly(['subscriptionStatus', 'planEndTimestamp', 'planId', 'planRegion', 'trialUsedSeconds']))
       );
     }
   }

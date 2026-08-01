@@ -1,6 +1,3 @@
-import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
-import { db } from './firebase';
-
 export interface UserProfile {
   uid: string;
   email: string;
@@ -11,12 +8,19 @@ export interface UserProfile {
   planEndTimestamp?: number;
 }
 
-export const getUserProfile = async (uid: string, email: string): Promise<UserProfile> => {
-  const userRef = doc(db, 'users', uid);
-  const userSnap = await getDoc(userRef);
+const getLocalData = () => {
+  const data = localStorage.getItem('linguachat_db');
+  return data ? JSON.parse(data) : { users: {} };
+};
 
-  if (userSnap.exists()) {
-    return userSnap.data() as UserProfile;
+const saveLocalData = (data: any) => {
+  localStorage.setItem('linguachat_db', JSON.stringify(data));
+};
+
+export const getUserProfile = async (uid: string, email: string): Promise<UserProfile> => {
+  const db = getLocalData();
+  if (db.users[uid]) {
+    return db.users[uid] as UserProfile;
   } else {
     const newProfile: UserProfile = {
       uid,
@@ -24,27 +28,30 @@ export const getUserProfile = async (uid: string, email: string): Promise<UserPr
       subscriptionStatus: 'free_trial',
       trialUsedSeconds: 0,
     };
-    await setDoc(userRef, newProfile);
+    db.users[uid] = newProfile;
+    saveLocalData(db);
     return newProfile;
   }
 };
 
 export const updateTrialSeconds = async (uid: string, seconds: number) => {
-  const userRef = doc(db, 'users', uid);
-  await updateDoc(userRef, {
-    trialUsedSeconds: seconds
-  });
+  const db = getLocalData();
+  if (db.users[uid]) {
+    db.users[uid].trialUsedSeconds = seconds;
+    saveLocalData(db);
+  }
 };
 
 export const activateSubscription = async (uid: string, planId: string, planRegion: string) => {
-  const userRef = doc(db, 'users', uid);
+  const db = getLocalData();
   const now = Date.now();
   const durationMs = planId === 'weekly' ? 7 * 24 * 60 * 60 * 1000 : 30 * 24 * 60 * 60 * 1000;
   
-  await updateDoc(userRef, {
-    subscriptionStatus: 'active',
-    planId,
-    planRegion,
-    planEndTimestamp: now + durationMs
-  });
+  if (db.users[uid]) {
+    db.users[uid].subscriptionStatus = 'active';
+    db.users[uid].planId = planId;
+    db.users[uid].planRegion = planRegion;
+    db.users[uid].planEndTimestamp = now + durationMs;
+    saveLocalData(db);
+  }
 };

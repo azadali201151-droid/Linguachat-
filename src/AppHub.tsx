@@ -8,7 +8,7 @@ import { pcmToBase64, base64ToPcm } from './lib/audioUtils';
 import { Mic, Phone, PhoneOff, Globe, BookOpen, CreditCard, Upload, ArrowLeft } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { GoogleGenAI, LiveServerMessage, Modality } from '@google/genai';
-import { auth } from './lib/firebase';
+import { auth, logout } from './lib/auth';
 import { getUserProfile, UserProfile, updateTrialSeconds, activateSubscription } from './lib/db';
 
 type AppState = 'idle' | 'connecting' | 'connected' | 'error' | 'payment';
@@ -26,6 +26,7 @@ export default function AppHub() {
   const [paymentScreenshot, setPaymentScreenshot] = useState<string | null>(null);
   const [verifyingPayment, setVerifyingPayment] = useState(false);
   const [paymentError, setPaymentError] = useState('');
+  const [promoCode, setPromoCode] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const wsRef = useRef<WebSocket | null>(null);
@@ -363,6 +364,32 @@ export default function AppHub() {
     }
   };
 
+  const handlePromoCodeSubmit = async () => {
+    if (!promoCode) {
+      setPaymentError("Please enter a promo code.");
+      return;
+    }
+    if (promoCode.trim() === 'Azad1122') {
+      if (auth.currentUser) {
+        setVerifyingPayment(true);
+        setPaymentError('');
+        try {
+          await activateSubscription(auth.currentUser.uid, 'monthly', 'promo');
+          const p = await getUserProfile(auth.currentUser.uid, auth.currentUser.email || '');
+          setProfile(p);
+          setStatus('idle');
+          setPromoCode('');
+        } catch (e: any) {
+           setPaymentError(e.message || "An error occurred applying the promo code.");
+        } finally {
+          setVerifyingPayment(false);
+        }
+      }
+    } else {
+      setPaymentError('Invalid promo code');
+    }
+  };
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -384,8 +411,8 @@ export default function AppHub() {
     <div className="min-h-screen bg-black text-zinc-100 font-sans selection:bg-indigo-500/30 flex flex-col items-center justify-center p-4 relative overflow-hidden">
       
       {/* Ambient background glows */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-indigo-500/10 rounded-full blur-[120px] pointer-events-none opacity-50" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-emerald-500/10 rounded-full blur-[100px] pointer-events-none opacity-30" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-indigo-500/5 rounded-full pointer-events-none opacity-50 hidden md:block" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-emerald-500/5 rounded-full pointer-events-none opacity-30 hidden md:block" />
 
       {status !== 'idle' && (
         <button 
@@ -516,6 +543,26 @@ export default function AppHub() {
                     </div>
                   </div>
                 )}
+                
+                <div className="pt-4 border-t border-zinc-800">
+                  <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider mb-2 block">Have a Promo Code?</label>
+                  <div className="flex gap-2">
+                    <input 
+                      type="text" 
+                      value={promoCode}
+                      onChange={(e) => setPromoCode(e.target.value)}
+                      placeholder="Enter promo code"
+                      className="flex-1 bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-indigo-500"
+                    />
+                    <button 
+                      onClick={handlePromoCodeSubmit}
+                      disabled={!promoCode || verifyingPayment}
+                      className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-white rounded-xl text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Apply
+                    </button>
+                  </div>
+                </div>
              </div>
            </motion.div>
         ) : status === 'idle' || status === 'error' ? (

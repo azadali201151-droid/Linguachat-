@@ -35,13 +35,15 @@ async function startServer() {
       const expectedAmount = region === 'pakistan' ? (plan === 'weekly' ? '130' : '500') : (plan === 'weekly' ? '3' : '10');
       const expectedTarget = region === 'pakistan' ? '03141201151' : 'PK82SADA0000003141201151';
 
-      const prompt = `You are an AI payment verifier. You need to verify if the provided screenshot is a valid payment receipt.
-Check for the following:
-1. Does the receipt show a successful payment or transfer?
-2. Is the amount paid exactly or equivalent to ${expectedAmount}? (e.g. Rs 130, $3)
-3. Is the target account/number related to ${expectedTarget}? (Sometimes it might be partially masked or match the name associated with it. If it matches ${expectedTarget} or looks like a valid transfer to the correct entity, accept it).
-4. Is the date on the receipt within the last 6 days from today? Today is ${new Date().toISOString()}.
+      const prompt = `You are an AI payment verifier. You need to verify if the provided screenshot is a valid and authentic payment receipt.
+Check for the following criteria very strictly:
+1. Does the receipt clearly show a successful payment, transfer, or transaction? (Pending, failed, or "request" screenshots must be rejected).
+2. Is the amount paid exactly ${expectedAmount}? (e.g. Rs ${expectedAmount} or $${expectedAmount}). It must match exactly.
+3. Does the recipient account/number match or clearly relate to ${expectedTarget}? (Accept if it shows ${expectedTarget} or a partially masked version that aligns with it).
+4. Is the date on the receipt within the last 2 days from today? Today is ${new Date().toISOString()}.
+5. Does the image look like a genuine banking/wallet app screenshot and not a random image or tampered photo?
 
+If ALL criteria are met, set verified to true. If ANY criterion fails, set verified to false and provide a specific, 1-sentence reason why.
 Return your answer as ONLY a raw JSON object with no markdown formatting or backticks:
 {
   "verified": boolean,
