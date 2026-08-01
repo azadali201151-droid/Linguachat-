@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Globe, BookOpen, User, ArrowRight, MessageSquare, Briefcase, GraduationCap, AlertCircle, LayoutDashboard, X, Mail, Lock } from 'lucide-react';
-import { signInWithGoogle, signInWithEmail, signUpWithEmail } from './lib/firebase';
+import { signInWithGoogle } from './lib/firebase';
 
 interface LandingPageProps {
   onSignIn?: () => void;
@@ -13,12 +13,6 @@ interface LandingPageProps {
 export default function LandingPage({ onSignIn, user, onGoToApp, initialError }: LandingPageProps) {
   const [errorMsg, setErrorMsg] = useState<string | null>(initialError || null);
   const [showAuthModal, setShowAuthModal] = useState(false);
-  const [isSignUp, setIsSignUp] = useState(false);
-  
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
 
   React.useEffect(() => {
     if (initialError) {
@@ -40,26 +34,6 @@ export default function LandingPage({ onSignIn, user, onGoToApp, initialError }:
       } else {
         setErrorMsg(`Failed to sign in (${error?.message || error?.code || 'Unknown Error'}). Please ensure Google Sign-In is enabled in Firebase Console.`);
       }
-    }
-  };
-
-  const handleEmailAuth = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setErrorMsg(null);
-    try {
-      if (isSignUp) {
-        await signUpWithEmail(email, password, name);
-      } else {
-        await signInWithEmail(email, password);
-      }
-      setShowAuthModal(false);
-      if (onSignIn) onSignIn();
-    } catch (error: any) {
-      console.error(error);
-      setErrorMsg(error?.message || 'Authentication failed. Please try again.');
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -234,89 +208,17 @@ export default function LandingPage({ onSignIn, user, onGoToApp, initialError }:
                   <span className="text-xl font-bold text-white tracking-tight">LinguaConnect</span>
                 </div>
                 <h3 className="text-2xl font-bold text-white mb-2">
-                  {isSignUp ? 'Create an Account' : 'Welcome Back'}
+                  Welcome
                 </h3>
                 <p className="text-zinc-400 text-sm">
-                  {isSignUp ? 'Sign up to start learning' : 'Sign in to continue your progress'}
+                  Sign in to continue your progress
                 </p>
-              </div>
-
-              <form onSubmit={handleEmailAuth} className="space-y-4">
-                {isSignUp && (
-                  <div>
-                    <label className="block text-sm font-medium text-zinc-400 mb-1">Full Name</label>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-zinc-500">
-                        <User className="w-5 h-5" />
-                      </div>
-                      <input
-                        type="text"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        className="w-full bg-zinc-900 border border-zinc-800 rounded-xl py-3 pl-10 pr-4 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all"
-                        placeholder="John Doe"
-                        required
-                      />
-                    </div>
-                  </div>
-                )}
-                <div>
-                  <label className="block text-sm font-medium text-zinc-400 mb-1">Email Address</label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-zinc-500">
-                      <Mail className="w-5 h-5" />
-                    </div>
-                    <input
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="w-full bg-zinc-900 border border-zinc-800 rounded-xl py-3 pl-10 pr-4 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all"
-                      placeholder="you@example.com"
-                      required
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-zinc-400 mb-1">Password</label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-zinc-500">
-                      <Lock className="w-5 h-5" />
-                    </div>
-                    <input
-                      type="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="w-full bg-zinc-900 border border-zinc-800 rounded-xl py-3 pl-10 pr-4 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all"
-                      placeholder="••••••••"
-                      required
-                      minLength={6}
-                    />
-                  </div>
-                </div>
-                
-                <button
-                  type="submit"
-                  disabled={isLoading}
-                  className="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-medium transition-colors shadow-lg shadow-indigo-500/25 flex items-center justify-center disabled:opacity-70"
-                >
-                  {isLoading ? (
-                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  ) : (
-                    isSignUp ? 'Sign Up' : 'Sign In'
-                  )}
-                </button>
-              </form>
-
-              <div className="mt-6 flex items-center text-zinc-500">
-                <div className="flex-grow border-t border-zinc-800"></div>
-                <span className="px-4 text-sm">or</span>
-                <div className="flex-grow border-t border-zinc-800"></div>
               </div>
 
               <button
                 type="button"
                 onClick={handleGoogleSignIn}
-                className="mt-6 w-full py-3 px-4 bg-white hover:bg-zinc-100 text-zinc-900 rounded-xl font-medium transition-colors flex items-center justify-center gap-3"
+                className="w-full py-3 px-4 bg-white hover:bg-zinc-100 text-zinc-900 rounded-xl font-medium transition-colors flex items-center justify-center gap-3 shadow-lg shadow-white/5"
               >
                 <svg className="w-5 h-5" viewBox="0 0 24 24">
                   <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
@@ -326,19 +228,6 @@ export default function LandingPage({ onSignIn, user, onGoToApp, initialError }:
                 </svg>
                 Continue with Google
               </button>
-
-              <div className="mt-6 text-center text-sm text-zinc-400">
-                {isSignUp ? 'Already have an account?' : "Don't have an account?"}{' '}
-                <button
-                  onClick={() => {
-                    setIsSignUp(!isSignUp);
-                    setErrorMsg(null);
-                  }}
-                  className="text-indigo-400 hover:text-indigo-300 font-medium transition-colors"
-                >
-                  {isSignUp ? 'Sign In' : 'Sign Up'}
-                </button>
-              </div>
             </motion.div>
           </div>
         )}
