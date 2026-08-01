@@ -28,11 +28,6 @@ export default function LandingPage({ onSignIn, user, onGoToApp, initialError }:
 
   const handleGoogleSignIn = async () => {
     try {
-      if (window.self !== window.top) {
-        setErrorMsg('Google Sign-In cannot be used inside the preview window due to browser security rules. Please click the "Open in new tab" icon (↗️) at the top right of this screen, and try signing in there.');
-        return;
-      }
-
       setErrorMsg(null);
       await signInWithGoogle();
       if (onSignIn) onSignIn();
