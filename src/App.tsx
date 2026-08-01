@@ -15,7 +15,6 @@ export default function App() {
       setUser(currentUser);
       setLoading(false);
     });
-
     return () => unsubscribe();
   }, []);
 
@@ -40,7 +39,6 @@ export default function App() {
       {/* Header for authenticated user */}
       <div className="absolute top-0 left-0 w-full p-4 z-50 flex justify-between items-center pointer-events-none">
         <div className="pointer-events-auto">
-          {/* We'll use this Home button in AppHub or keep it here */}
           <button 
             onClick={() => setShowLanding(true)}
             className="p-2 pr-4 text-zinc-400 hover:text-white bg-zinc-900/50 hover:bg-zinc-800 backdrop-blur-md rounded-full border border-zinc-800 transition-colors flex items-center gap-2 shadow-lg"
@@ -64,7 +62,6 @@ export default function App() {
           </div>
         </div>
       </div>
-
       <AppHub />
     </div>
   );
