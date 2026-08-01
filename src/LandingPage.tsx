@@ -34,12 +34,11 @@ export default function LandingPage({ onSignIn, user, onGoToApp, initialError }:
     } catch (error: any) {
       console.error(error);
       if (error?.code === 'auth/cancelled-popup-request' || error?.code === 'auth/popup-closed-by-user') {
-        setErrorMsg('Sign-in popup was closed before completing. Please try again.');
+        setErrorMsg('Sign-in popup closed. If it bounced back instantly, you MUST add this preview URL to Firebase Console -> Authentication -> Settings -> Authorized domains.');
+      } else if (error?.code === 'auth/unauthorized-domain') {
+        setErrorMsg('Domain not authorized. Please add this URL to Firebase Console -> Authentication -> Settings -> Authorized domains.');
       } else {
-        setErrorMsg(
-          `Failed to sign in (${error?.code || 'Unknown Error'}).\n\n` +
-          `Make sure this domain is added to Firebase Console -> Authentication -> Settings -> Authorized domains.`
-        );
+        setErrorMsg(`Failed to sign in (${error?.message || error?.code || 'Unknown Error'}). Please ensure Google Sign-In is enabled in Firebase Console.`);
       }
     }
   };
