@@ -3,13 +3,13 @@ import { getAuth, signOut, signInAnonymously, GoogleAuthProvider, signInWithPopu
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBK_S9EBvB_LhR9koiatRknNbL5A6Arp6k",
-  authDomain: "leafy-creek-z8gvj.firebaseapp.com",
-  projectId: "leafy-creek-z8gvj",
-  storageBucket: "leafy-creek-z8gvj.firebasestorage.app",
-  messagingSenderId: "442765262051",
-  appId: "1:442765262051:web:49f39bc7a4e02eb15259d6",
-  firestoreDatabaseId: "ai-studio-linguachat-3b8cf2d3-5ce1-45ad-9e86-9ec62ae351c8"
+  apiKey: (import.meta as any).env.VITE_FIREBASE_API_KEY || "AIzaSyBK_S9EBvB_LhR9koiatRknNbL5A6Arp6k",
+  authDomain: (import.meta as any).env.VITE_FIREBASE_AUTH_DOMAIN || "leafy-creek-z8gvj.firebaseapp.com",
+  projectId: (import.meta as any).env.VITE_FIREBASE_PROJECT_ID || "leafy-creek-z8gvj",
+  storageBucket: (import.meta as any).env.VITE_FIREBASE_STORAGE_BUCKET || "leafy-creek-z8gvj.firebasestorage.app",
+  messagingSenderId: (import.meta as any).env.VITE_FIREBASE_MESSAGING_SENDER_ID || "442765262051",
+  appId: (import.meta as any).env.VITE_FIREBASE_APP_ID || "1:442765262051:web:49f39bc7a4e02eb15259d6",
+  firestoreDatabaseId: (import.meta as any).env.VITE_FIREBASE_DATABASE_ID || "ai-studio-linguachat-3b8cf2d3-5ce1-45ad-9e86-9ec62ae351c8"
 };
 
 export const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
