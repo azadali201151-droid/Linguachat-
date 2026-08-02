@@ -128,7 +128,7 @@ export default function AppHub() {
         // Direct browser-to-Gemini connection
         const ai = new GoogleGenAI({ apiKey: apiKeyToUse });
         const session = await ai.live.connect({
-          model: "gemini-3.1-flash-live-preview",
+          model: "gemini-2.0-flash-exp",
           callbacks: {
             onmessage: (message: LiveServerMessage) => {
               const audio = message.serverContent?.modelTurn?.parts?.[0]?.inlineData?.data;
@@ -209,8 +209,9 @@ export default function AppHub() {
           try {
             const msg = JSON.parse(event.data);
             if (msg.error) {
-               setErrorMsg(msg.error);
                stopSession();
+               setErrorMsg(msg.error);
+               setStatus('error');
                return;
             }
 
@@ -227,8 +228,9 @@ export default function AppHub() {
         };
 
         ws.onerror = (e) => {
-          setErrorMsg("Failed to connect to server. If deployed on Vercel, note that Vercel doesn't support WebSocket servers. Please deploy your backend to Render or Railway, or add GEMINI_API_KEY to your Vercel Environment Variables.");
           stopSession();
+          setErrorMsg("Failed to connect to server. If deployed on Vercel, note that Vercel doesn't support WebSocket servers. Please deploy your backend to Render or Railway, or add GEMINI_API_KEY to your Vercel Environment Variables.");
+          setStatus('error');
         };
 
         const processor = audioCtx.createScriptProcessor(4096, 1, 1);
