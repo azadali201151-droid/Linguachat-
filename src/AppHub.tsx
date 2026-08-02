@@ -115,11 +115,17 @@ export default function AppHub() {
       let apiKeyToUse = '';
       try {
         const res = await fetch('/api/env');
-        const data = await res.json();
-        apiKeyToUse = data.apiKey;
+        if (res.ok) {
+          const data = await res.json();
+          apiKeyToUse = data.apiKey;
+        } else {
+          console.warn("Failed to fetch /api/env on Vercel, status:", res.status);
+        }
       } catch (e) {
-        console.error("Failed to fetch /api/env", e);
+        console.warn("Could not reach /api/env", e);
       }
+      
+      // Fallback to client-side env variable if available (for Vercel)
       if (!apiKeyToUse && (import.meta as any).env.VITE_GEMINI_API_KEY) {
         apiKeyToUse = (import.meta as any).env.VITE_GEMINI_API_KEY;
       }
